@@ -15,6 +15,12 @@
     "dependency",
     "injection"
   ],
+  "dependencies": {
+    "lodash": "3.5.*",
+    "esprima": "2.1.*",
+    "stack-trace": "0.0.*",
+    "jquery-deferred": "0.3.*"
+  },
   "author": "Jan Święcki <jan.swiecki@gmail.com>",
   "license": "MIT",
   "bugs": {
