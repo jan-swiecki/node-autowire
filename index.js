@@ -1,11 +1,15 @@
-var Injector = require("./lib/Injector.js");
-
 var log = require("./lib/SimpleLogger.js").getLogger();
 
-injector = new Injector();
+var Injector = require("./lib/Injector.js");
+var injector = new Injector();
 
-module.exports = function(callback) {
+var API = function(callback) {
   return injector.executeInject(callback, {});
-}
+};
 
-module.exports.Injector = Injector;
+API.Injector = Injector;
+API._isAutowireModule = true;
+
+module.exports = API;
+
+

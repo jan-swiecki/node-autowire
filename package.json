@@ -1,6 +1,6 @@
 {
   "name": "autowire",
-  "version": "1.1.1",
+  "version": "2.0.0-alpha",
   "description": "Automagically autowire everything",
   "main": "index.js",
   "scripts": {
@@ -16,10 +16,11 @@
     "injection"
   ],
   "dependencies": {
-    "lodash": "3.5.*",
+    "bluebird": "^2.9.34",
     "esprima": "2.1.*",
-    "stack-trace": "0.0.*",
-    "jquery-deferred": "0.3.*"
+    "jquery-deferred": "0.3.*",
+    "lodash": "3.5.*",
+    "stack-trace": "0.0.*"
   },
   "author": "Jan Święcki <jan.swiecki@gmail.com>",
   "license": "MIT",
