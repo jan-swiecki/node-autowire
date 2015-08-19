@@ -10,12 +10,13 @@ var moduleFinder = new ModuleFinder();
 var injector = new Injector(moduleFinder, codeMutator);
 
 var API = function(callback) {
-  var wrapped = injector.wrap(callback).autoWireModules();
-  return wrapped();
+  var wrapped = injector.attachSafe(callback).autoWireModules();
+  return wrapped.applyInject();
 };
 
 API.Injector = Injector;
 API.ModuleFinder = ModuleFinder;
+API.CodeMutator = CodeMutator;
 API._isAutowireModule = true;
 
 module.exports = API;

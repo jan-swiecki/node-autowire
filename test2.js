@@ -8,13 +8,14 @@ var moduleFinder = new ModuleFinder();
 // TODO: autowire to new instances
 var injector = new Injector(moduleFinder, codeMutator);
 
-var fn = function test(Rest, fs) {
+var fn = function test(Rest, x, fs) {
 	console.log("Rest =", Rest);
-	console.log(fs.existsSync("test.js"));
+	//console.log(fs.existsSync("test.js"));
 };
 
-fn = injector.wrap(fn).autoWireModules();
+//fn = injector.wrap(fn).autoWireModules();
 //fn = injector.wrap(fn);
+fn = injector.attachSafe(fn).autoWireModules();
 
 fn.applyInject({
 	"Rest": 123
