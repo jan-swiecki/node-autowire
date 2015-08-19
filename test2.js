@@ -10,10 +10,11 @@ var injector = new Injector(moduleFinder, codeMutator);
 
 var fn = function test(Rest, fs) {
 	console.log("Rest =", Rest);
-	console.log("fs =", fs);
+	console.log(fs.existsSync("test.js"));
 };
 
 fn = injector.wrap(fn).autoWireModules();
+//fn = injector.wrap(fn);
 
 fn.applyInject({
 	"Rest": 123
