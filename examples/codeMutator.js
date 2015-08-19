@@ -1,4 +1,4 @@
-var CodeMutator = require("./lib/CodeMutator.js");
+var CodeMutator = require("./../lib/CodeMutator.js");
 var codeMutator = new CodeMutator();
 
 var fn = function test() {

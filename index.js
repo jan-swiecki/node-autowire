@@ -11,7 +11,14 @@ var injector = new Injector(moduleFinder, codeMutator);
 
 var API = function(callback) {
   var wrapped = injector.attachSafe(callback).autoWireModules();
-  return wrapped.applyInject();
+  return wrapped.executeInject();
+};
+
+API.instantiate = function(clazz) {
+  var obj = Object.create(clazz["prototype"]);
+  var constructor = injector.attachSafe(clazz).autoWireModules();
+  constructor.applyInject(obj);
+  return obj;
 };
 
 API.Injector = Injector;

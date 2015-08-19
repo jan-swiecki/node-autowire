@@ -1,6 +1,6 @@
-var log = require("./lib/SimpleLogger.js").getLogger();
+var log = require("./../lib/SimpleLogger.js").getLogger();
 
-Autowire = require("./index.js");
+Autowire = require("./../index.js");
 
 // auto wire core modules
 Autowire(function(fs) {

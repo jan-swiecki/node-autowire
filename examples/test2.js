@@ -1,6 +1,6 @@
-var Injector = require("./lib/Injector.js");
-var ModuleFinder = require("./lib/ModuleFinder.js");
-var CodeMutator = require("./lib/CodeMutator.js");
+var Injector = require("./../lib/Injector.js");
+var ModuleFinder = require("./../lib/ModuleFinder.js");
+var CodeMutator = require("./../lib/CodeMutator.js");
 
 var codeMutator = new CodeMutator();
 var moduleFinder = new ModuleFinder();
@@ -17,7 +17,7 @@ var fn = function test(Rest, x, fs) {
 //fn = injector.wrap(fn);
 fn = injector.attachSafe(fn).autoWireModules();
 
-fn.applyInject({
+fn.executeInject({
 	"Rest": 123
 });
 
