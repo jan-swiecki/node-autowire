@@ -18,6 +18,7 @@
   "dependencies": {
     "bluebird": "^2.9.34",
     "esprima": "2.1.*",
+    "escodegen": "^1.6.1",
     "jquery-deferred": "0.3.*",
     "lodash": "3.5.*",
     "stack-trace": "0.0.*"
@@ -27,8 +28,5 @@
   "bugs": {
     "url": "https://github.com/jan-swiecki/node-autowire/issues"
   },
-  "homepage": "https://github.com/jan-swiecki/node-autowire",
-  "devDependencies": {
-    "escodegen": "^1.6.1"
-  }
+  "homepage": "https://github.com/jan-swiecki/node-autowire"
 }
