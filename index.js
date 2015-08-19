@@ -2,11 +2,16 @@ var log = require("./lib/SimpleLogger.js").getLogger();
 
 var Injector = require("./lib/Injector.js");
 var ModuleFinder = require("./lib/ModuleFinder.js");
+var CodeMutator = require("./lib/CodeMutator.js");
 
-var injector = new Injector();
+var codeMutator = new CodeMutator();
+var moduleFinder = new ModuleFinder();
+
+var injector = new Injector(moduleFinder, codeMutator);
 
 var API = function(callback) {
-  return injector.applyInjectAutoDiscover(callback, {});
+  var wrapped = injector.wrap(callback).autoWireModules();
+  return wrapped();
 };
 
 API.Injector = Injector;
