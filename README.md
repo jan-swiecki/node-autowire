@@ -3,6 +3,8 @@ Autowire
 
 Automagically autowire everything.
 
+This is alpha version, API may change drastically with major versions.
+
 Installation
 ------------
 

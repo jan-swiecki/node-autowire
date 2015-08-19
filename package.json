@@ -27,5 +27,8 @@
   "bugs": {
     "url": "https://github.com/jan-swiecki/node-autowire/issues"
   },
-  "homepage": "https://github.com/jan-swiecki/node-autowire"
+  "homepage": "https://github.com/jan-swiecki/node-autowire",
+  "devDependencies": {
+    "escodegen": "^1.6.1"
+  }
 }
