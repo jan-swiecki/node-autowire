@@ -12,17 +12,21 @@ var CodeMutator = require("./lib/CodeMutator.js");
 var codeMutator = new CodeMutator();
 var moduleFinder = new ModuleFinder();
 
-var injector = new Injector(moduleFinder, codeMutator).withAutowireModules();
+var injector = Injector.create(moduleFinder, codeMutator).withAutowireModules();
 
-var API = function(callback) {
+//log("injector.uuid = "+injector._uuid);
+//var x = injector(function(lodash){ return lodash; });
+//console.log(x.isAutowireModules);
+//return;
+
+var API = function(func) {
   var parentModuleName = getParentModuleName();
-  log.debug("Autowiring module: "+parentModuleName);
+  log.info("Autowiring module: "+parentModuleName);
 
-  //TODO: new concept
-  //callback = injector(callback)
+  return injector(func);
 
-  var wrapped = injector.attachSafe(callback).autoWireModules();
-  return wrapped.executeInject();
+  //var wrapped = injector.attachSafe(func).autoWireModules();
+  //return wrapped.executeInject();
 };
 
 function getParentModuleName() {

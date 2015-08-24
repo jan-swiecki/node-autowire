@@ -22,6 +22,7 @@
     "esprima": "2.1.*",
     "jquery-deferred": "0.3.*",
     "lodash": "3.10.*",
+    "node-uuid": "^1.4.3",
     "stack-trace": "0.0.*"
   },
   "author": "Jan Święcki <jan.swiecki@gmail.com>",
