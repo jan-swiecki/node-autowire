@@ -1,7 +1,7 @@
 Autowire 2.0
 ============
 
-Angular-like automatic dependency injection.
+Angular-like automatic dependency injection for NodeJS.
 
 This module automagically autowires everything it can find.
 
@@ -104,7 +104,7 @@ Beside native NodeJS module cache Autowire caches paths and performes autodiscov
 
 ## License
 
-The MIT License (MIT) Copyright (c) 2015 Jan ?wi?cki
+The MIT License (MIT) Copyright (c) 2015 Jan Święcki
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
