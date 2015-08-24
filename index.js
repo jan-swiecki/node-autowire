@@ -1,4 +1,11 @@
-var log = require("./lib/SimpleLogger.js").getLogger();
+var stackTrace = require('stack-trace');
+var PATH = require("path");
+
+var log = require("./lib/DebugLogger.js").getLogger("autowire");
+
+log("initializing");
+
+return;
 
 var Injector = require("./lib/Injector.js");
 var ModuleFinder = require("./lib/ModuleFinder.js");
@@ -10,15 +17,28 @@ var moduleFinder = new ModuleFinder();
 var injector = new Injector(moduleFinder, codeMutator);
 
 var API = function(callback) {
+  var parentModuleName = getParentModuleName();
+  log.trace("Autowiring module: "+parentModuleName);
+
   var wrapped = injector.attachSafe(callback).autoWireModules();
   return wrapped.executeInject();
 };
+
+function getParentModuleName() {
+  var parentFilename = stackTrace.get()[2].getFileName();
+  var name = PATH.parse(parentFilename).base;
+  return name;
+}
 
 API.instantiate = function(clazz) {
   var obj = Object.create(clazz["prototype"]);
   var constructor = injector.attachSafe(clazz).autoWireModules();
   constructor.applyInject(obj);
   return obj;
+};
+
+API.addImportPath = function(path) {
+  moduleFinder.addImportPath(path);
 };
 
 API.Injector = Injector;
