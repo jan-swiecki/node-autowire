@@ -12,11 +12,14 @@ var CodeMutator = require("./lib/CodeMutator.js");
 var codeMutator = new CodeMutator();
 var moduleFinder = new ModuleFinder();
 
-var injector = new Injector(moduleFinder, codeMutator);
+var injector = new Injector(moduleFinder, codeMutator).withAutowireModules();
 
 var API = function(callback) {
   var parentModuleName = getParentModuleName();
-  log.trace("Autowiring module: "+parentModuleName);
+  log.debug("Autowiring module: "+parentModuleName);
+
+  //TODO: new concept
+  //callback = injector(callback)
 
   var wrapped = injector.attachSafe(callback).autoWireModules();
   return wrapped.executeInject();
