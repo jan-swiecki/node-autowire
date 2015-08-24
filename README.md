@@ -93,9 +93,18 @@ Lets say we want' to inject `name`.
 
 Beside native NodeJS module cache Autowire caches paths and performes autodiscovery once.
 
+# Why?
+
+1. It is simpler
+  * You get module autodiscovery in project folders
+  * You write module name only once
+2. Lexical-clojure encapsulation of modules makes more sense. For example now you are 100% sure you will not leak anything into global scope.
+3. ???
+4. Profit!
+
 ## License
 
-The MIT License (MIT) Copyright (c) 2015 Jan Œwiêcki
+The MIT License (MIT) Copyright (c) 2015 Jan ?wi?cki
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
