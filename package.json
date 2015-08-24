@@ -1,6 +1,6 @@
 {
   "name": "autowire",
-  "version": "2.0.0-alpha.10",
+  "version": "2.0.0-alpha.11",
   "description": "Automagically autowire everything",
   "main": "index.js",
   "scripts": {
