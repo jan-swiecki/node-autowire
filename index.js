@@ -3,11 +3,7 @@ var PATH = require("path");
 
 var log = require("./lib/DebugLogger.js").getLogger("autowire");
 
-//console.log("log.name --> ", log.loggerName);
-//
-//module.simpleLogger = {
-//  name: log.loggerName
-//};
+log("Initializing Autowire module");
 
 var Injector = require("./lib/Injector.js");
 var ModuleFinder = require("./lib/ModuleFinder.js");
