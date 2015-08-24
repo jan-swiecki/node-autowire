@@ -1,9 +1,16 @@
+/**
+ * Autowire module, singleton.
+ *
+ * @author Jan Œwiêcki <jan.swiecki@gmail.com>
+ */
 var stackTrace = require('stack-trace');
 var PATH = require("path");
 
 var log = require("./lib/DebugLogger.js").getLogger("autowire");
 
 log("Initializing Autowire module");
+
+var ModuleHelper = require("./lib/ModuleHelper.js");
 
 var Injector = require("./lib/Injector.js");
 var ModuleFinder = require("./lib/ModuleFinder.js");
@@ -14,25 +21,16 @@ var moduleFinder = new ModuleFinder();
 
 var injector = Injector.create(moduleFinder, codeMutator).withAutowireModules();
 
-//log("injector.uuid = "+injector._uuid);
-//var x = injector(function(lodash){ return lodash; });
-//console.log(x.isAutowireModules);
-//return;
-
 var API = function(func) {
   var parentModuleName = getParentModuleName();
   log.info("Autowiring module: "+parentModuleName);
 
   return injector(func);
-
-  //var wrapped = injector.attachSafe(func).autoWireModules();
-  //return wrapped.executeInject();
 };
 
 function getParentModuleName() {
   var parentFilename = stackTrace.get()[2].getFileName();
-  var name = PATH.parse(parentFilename).base;
-  return name;
+  return PATH.parse(parentFilename).base;
 }
 
 API.instantiate = function(clazz) {
@@ -42,8 +40,24 @@ API.instantiate = function(clazz) {
   return obj;
 };
 
+/**
+ * Add path to moduleFinder.
+ *
+ * Path is resolved to absolute path from callee context.
+ *
+ * @param path
+ */
 API.addImportPath = function(path) {
+  var absPath = PATH.join(PATH.parse(ModuleHelper.getParentModule(1).filename).dir, path);
   moduleFinder.addImportPath(path);
+};
+
+API.alias = function(alias, realname) {
+  moduleFinder.addAlias(alias, realname);
+};
+
+API.wire = function(name, object) {
+  moduleFinder.wire(name, object);
 };
 
 API.Injector = Injector;
