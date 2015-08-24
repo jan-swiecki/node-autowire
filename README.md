@@ -77,11 +77,11 @@ module.exports = Autowire(function(fs, express, _, myVar) {
 
 ## Module auto discovery algorithm
 
-Lets say we want' to inject `name`.
+Lets say we want to inject `name`.
 
     1. Try `inner_cache[name]` (hit Autowire inner cache)
     2. Try `require(name)`
-    3. Construct search space of impot paths:
+    3. Construct search space of import paths:
     
        importPaths = ["./", "./lib"] ++ [added import paths] ++ ["../", "../../", "../../../", ... until we find first parent folder with package.json]
        extensions  = [".js", ".json"]
