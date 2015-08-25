@@ -1,10 +1,10 @@
 {
   "name": "autowire",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Automagically autowire everything",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test/test.js"
   },
   "repository": {
     "type": "git",
@@ -14,9 +14,6 @@
     "autowire",
     "dependency injection"
   ],
-  "scripts": {
-    "test": "mocha test/test.js"
-  },
   "dependencies": {
     "bluebird": "^2.9.34",
     "debug": "^2.2.0",
