@@ -5,14 +5,6 @@ function randomInt(low, high) {
 	return Math.floor(Math.random() * (high - low) + low);
 }
 
-function getNewAutowire() {
-	var id = PATH.resolve("..");
-	if(require.cache[id]) {
-		delete require.cache[id];
-	}
-	return require("..");
-}
-
 describe('Array', function() {
 	describe('#indexOf()', function () {
 		it('should return -1 when the value is not present', function () {
@@ -31,14 +23,17 @@ describe('Array', function() {
 });
 
 describe('Autowire', function(){
-	var Autowire;
-
-	beforeEach(function(){
-		Autowire = getNewAutowire();
-	});
+	var Autowire = require("..");
 
 	describe('classes instantiation', function(){
-		it('should work instantiate class on each inject', function(){
+		beforeEach(function(){
+			Autowire.reset();
+			delete require.cache[PATH.resolve(__dirname+"/MyClass.js")];
+			delete require.cache[PATH.resolve(__dirname+"/MyClassModule1.js")];
+			delete require.cache[PATH.resolve(__dirname+"/MyClassModule2.js")];
+		});
+
+		it('should instantiate class on each inject', function(){
 			var MyClass = require("./MyClass.js");
 			Autowire.wireClass("MyClass", MyClass);
 			Autowire.alias("uuid", "node-uuid");
@@ -47,6 +42,18 @@ describe('Autowire', function(){
 				assert(!!MyClassModule1.uuid, "uuid1 should be defined");
 				assert(!!MyClassModule2.uuid, "uuid2 should be defined");
 				assert.notEqual(MyClassModule1.uuid, MyClassModule2.uuid);
+			});
+		});
+
+		it('should instantiate class only once (singleton mode)', function(){
+			var MyClass = require("./MyClass.js");
+			Autowire.wireClass("MyClass", MyClass, true);
+			Autowire.alias("uuid", "node-uuid");
+
+			Autowire(function(MyClassModule1, MyClassModule2) {
+				assert(!!MyClassModule1.uuid, "uuid1 should be defined");
+				assert(!!MyClassModule2.uuid, "uuid2 should be defined");
+				assert.equal(MyClassModule1.uuid, MyClassModule2.uuid);
 			});
 		});
 	});
