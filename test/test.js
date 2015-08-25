@@ -57,4 +57,48 @@ describe('Autowire', function(){
 			});
 		});
 	});
+
+	//describe('dependencies identities', function(){
+	//	it('should have same moduleFinder as injector', function(){
+	//		assert.strictEqual(Autowire.moduleFinder, Autowire.injector.moduleFinder);
+	//	});
+	//});
+
+	describe("adding import paths", function(){
+		it('should add import path relative to current folder', function(){
+			var dir = "./testdir";
+			Autowire.addImportPath(dir);
+			var paths = Autowire.injector.moduleFinder.importPaths;
+			assert.equal(paths[paths.length - 1], PATH.resolve(PATH.join(__dirname, dir)));
+		});
+	});
+
+	describe('autowiring', function(){
+		it('should wire fs', function(){
+			Autowire(function(fs){
+				assert.strictEqual(fs, require("fs"));
+			});
+		});
+
+		it('should throw error', function(){
+			assert.throws(function(){
+				Autowire(function(TestModule){});
+			})
+		});
+
+		it('should not throw error', function(){
+			Autowire.injector.moduleFinder.invalidateCache();
+			Autowire.addImportPath("./testdir");
+			Autowire.addImportPath("./testdir/anotherdir");
+			assert.doesNotThrow(function(){
+				Autowire(function(TestModule){});
+			});
+		});
+
+		it('should have inner module of "inner test module"', function(){
+			Autowire(function(TestModule){
+				assert.equal(TestModule.InnerTestModule, "inner test module");
+			});
+		});
+	});
 });

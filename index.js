@@ -22,20 +22,16 @@ var ModuleFinder = require("./lib/ModuleFinder.js");
 var CodeMutator = require("./lib/CodeMutator.js");
 var Instantiator = require("./lib/Instantiator.js");
 
-function Autowire(codeMutator, moduleFinder, injector, instantiator) {
-  this.moduleFinder = moduleFinder;
-  this.codeMutator = codeMutator;
+// constants
+var PARENT_DEPTH = 2;
+
+function Autowire(injector) {
   this.injector = injector;
-  this.instantiator = instantiator;
 }
 
 Autowire.prototype.reset = function() {
   var dependencies = Autowire.getNewDependencies();
-
-  this.codeMutator = dependencies.codeMutator;
-  this.moduleFinder = dependencies.moduleFinder;
   this.injector = dependencies.injector;
-  this.instantiator = dependencies.instantiator;
 
   //this.moduleFinder.reset();
   //this.codeMutator.reset();
@@ -52,7 +48,7 @@ Autowire.prototype.reset = function() {
  * @returns {Array|{index: number, input: string}}
  */
 Autowire.prototype.run = function(func) {
-  var filename = ModuleHelper.getParentModule(1).filename;
+  var filename = ModuleHelper.getParentModule(PARENT_DEPTH).filename;
   var parsed = PATH.parse(filename);
   log.info("Autowiring module \"%s\" with rootPath \"%s\"", parsed.base, parsed.dir);
 
@@ -63,7 +59,7 @@ Autowire.prototype.run = function(func) {
 };
 
 function getParentModuleName() {
-  var parentFilename = ModuleHelper.getParentModule(1).filename;
+  var parentFilename = ModuleHelper.getParentModule(PARENT_DEPTH).filename;
   return PATH.parse(parentFilename).base;
 }
 
@@ -76,7 +72,7 @@ Autowire.instantiate = function(clazz) {
 };
 
 Autowire.prototype.wireClass = function(className, clazz, singleton) {
-  this.moduleFinder.wireClass(className, clazz, singleton);
+  this.injector.moduleFinder.wireClass(className, clazz, singleton);
 };
 
 /**
@@ -87,16 +83,17 @@ Autowire.prototype.wireClass = function(className, clazz, singleton) {
  * @param path
  */
 Autowire.prototype.addImportPath = function(path) {
-  var absPath = PATH.join(PATH.parse(ModuleHelper.getParentModule(1).filename).dir, path);
-  this.moduleFinder.addImportPath(absPath);
+  var absPath = PATH.join(PATH.parse(ModuleHelper.getParentModule(PARENT_DEPTH).filename).dir, path);
+  log.trace("addImportPath", absPath);
+  this.injector.moduleFinder.addImportPath(absPath);
 };
 
 Autowire.prototype.alias = function(alias, realname) {
-  this.moduleFinder.addAlias(alias, realname);
+  this.injector.moduleFinder.addAlias(alias, realname);
 };
 
 Autowire.prototype.wire = function(name, object) {
-  this.moduleFinder.wire(name, object);
+  this.injector.moduleFinder.wire(name, object);
 };
 
 //ClassHelper.attachClone(Autowire);
@@ -112,7 +109,7 @@ Autowire.prototype.clone = function() {
 Autowire.getInstance = function(codeMutator, moduleFinder, injector, instantiator) {
   return Functionize(Autowire, [codeMutator, moduleFinder, injector, instantiator], function(func) {
     // depth=2 because we are functionized
-    var filename = ModuleHelper.getParentModule(2).filename;
+    var filename = ModuleHelper.getParentModule(PARENT_DEPTH).filename;
     var parsed = PATH.parse(filename);
     log.info("Autowiring module \"%s\" with rootPath \"%s\"", parsed.base, parsed.dir);
 
@@ -141,9 +138,6 @@ Autowire.getNewDependencies = function() {
   instantiator.setInjector(injector);
 
   return {
-    codeMutator: codeMutator,
-    instantiator: instantiator,
-    moduleFinder: moduleFinder,
     injector: injector
   };
 
@@ -152,12 +146,7 @@ Autowire.getNewDependencies = function() {
 Autowire.newInstance = function() {
   var dependencies = Autowire.getNewDependencies();
 
-  var autowire = Autowire.getInstance(
-      dependencies.codeMutator,
-      dependencies.moduleFinder,
-      dependencies.injector,
-      dependencies.instantiator
-  );
+  var autowire = Autowire.getInstance(dependencies.injector);
 
   autowire.Injector = Injector;
   autowire.ModuleFinder = ModuleFinder;
