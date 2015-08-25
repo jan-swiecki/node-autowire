@@ -75,6 +75,10 @@ Autowire.prototype.wireClass = function(className, clazz, singleton) {
   this.injector.moduleFinder.wireClass(className, clazz, singleton);
 };
 
+Autowire.prototype.markAsClass = function(className, singleton) {
+  this.injector.moduleFinder.markAsClass(className, singleton);
+};
+
 /**
  * Add path to moduleFinder.
  *
