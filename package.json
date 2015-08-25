@@ -12,9 +12,11 @@
   },
   "keywords": [
     "autowire",
-    "dependency",
-    "injection"
+    "dependency injection"
   ],
+  "scripts": {
+    "test": "mocha test/test.js"
+  },
   "dependencies": {
     "bluebird": "^2.9.34",
     "debug": "^2.2.0",

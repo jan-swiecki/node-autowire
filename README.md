@@ -3,7 +3,7 @@ Autowire 2.0
 
 Angular-like automatic dependency injection for NodeJS.
 
-This module automagically autowires everything it can find.
+This module automagically autowires everything it can find. It finds installed modules (native node discovery) and user modules in current project folders.
 
 This is beta version: API may change with minor versions, performance may suffer.
 

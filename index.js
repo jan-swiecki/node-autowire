@@ -15,21 +15,30 @@ var ModuleHelper = require("./lib/ModuleHelper.js");
 var Injector = require("./lib/Injector.js");
 var ModuleFinder = require("./lib/ModuleFinder.js");
 var CodeMutator = require("./lib/CodeMutator.js");
+var Instantiator = require("./lib/Instantiator.js");
 
 var codeMutator = new CodeMutator();
-var moduleFinder = new ModuleFinder();
+var instantiator = new Instantiator();
+var moduleFinder = new ModuleFinder(instantiator);
 
 var injector = Injector.create(moduleFinder, codeMutator).withAutowireModules();
 
-var API = function(func) {
-  var parentModuleName = getParentModuleName();
-  log.info("Autowiring module: "+parentModuleName);
+// injector depends on moduleFinder depends on instantiator depends on injector #yolo
+instantiator.setInjector(injector);
 
-  return injector(func);
+var API = function(func) {
+  var filename = ModuleHelper.getParentModule(1).filename;
+  var parsed = PATH.parse(filename);
+  log.info("Autowiring module \"%s\" with rootPath \"%s\"", parsed.base, parsed.dir);
+
+  var inj = injector.withFunc(func).withRootPath(parsed.dir, parsed.base);
+  log("inj.rootPath = %s", inj.moduleFinder.rootPath);
+  return inj.exec();
+  //return injector(func);
 };
 
 function getParentModuleName() {
-  var parentFilename = stackTrace.get()[2].getFileName();
+  var parentFilename = ModuleHelper.getParentModule(1).filename;
   return PATH.parse(parentFilename).base;
 }
 
@@ -38,6 +47,10 @@ API.instantiate = function(clazz) {
   var constructor = injector.attachSafe(clazz).autoWireModules();
   constructor.applyInject(obj);
   return obj;
+};
+
+API.wireClass = function(className, clazz, singleton) {
+  moduleFinder.wireClass(className, clazz, singleton);
 };
 
 /**
@@ -49,7 +62,7 @@ API.instantiate = function(clazz) {
  */
 API.addImportPath = function(path) {
   var absPath = PATH.join(PATH.parse(ModuleHelper.getParentModule(1).filename).dir, path);
-  moduleFinder.addImportPath(path);
+  moduleFinder.addImportPath(absPath);
 };
 
 API.alias = function(alias, realname) {
