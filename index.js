@@ -159,6 +159,7 @@ Autowire.newInstance = function() {
   autowire.newInstance = Autowire.newInstance;
   autowire.getInstance = Autowire.getInstance;
   autowire.resetModule = Autowire.resetModule;
+  autowire.getNewDependencies = Autowire.getNewDependencies;
 
   return autowire;
 };

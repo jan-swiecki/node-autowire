@@ -143,6 +143,8 @@ Imho this is just a better approach.
 
 * Auto discovery inside project folders (recursively)
 * Auto instantiation of classes (configurable)
+* Auto convert dash-case into camelCase, so e.g. we can with zero config inject `node-uuid` as `nodeUuid`. Maybe add auto discovery with partial matching, so `uuid` will match?
+* Somehow allow having same file names in different folders. Proposition: create namespaces as folders (and manually configurable namespaces). (Non?)-problem: variable names don't have `/` character.
 * Write tests per module (e.g. tests for `ModuleFinder`)
 
 ## License
