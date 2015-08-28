@@ -32,7 +32,7 @@ function Autowire(injector) {
 Autowire.prototype.reset = function() {
   var dependencies = Autowire.getNewDependencies();
   this.injector = dependencies.injector;
-
+  this.isExecuteOnImport = false;
   //this.moduleFinder.reset();
   //this.codeMutator.reset();
   //this.injector.reset();
@@ -104,6 +104,13 @@ Autowire.prototype.wire = function(name, object) {
 
 Autowire.prototype.clone = function() {
   return new Autowire(codeMutator.clone(), moduleFinder.clone(), injector.clone(), instantiator.clone());
+};
+
+/**
+ * Instantiate on each import
+ */
+Autowire.prototype.executeOnImport = function() {
+    this.injector.isExecuteOnImport = true;
 };
 
 //Autowire.prototype.getInstance = function() {
