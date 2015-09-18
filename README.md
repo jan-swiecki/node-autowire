@@ -134,7 +134,7 @@ Imho this is just a better approach.
 * You don't waste time on manually wiring dependencies.
 * Module dependencies are clearly and well defined (no more finding all `require` invocations).
 * You are forced to write code in a decoupled way (true dependency injection, without classes being instantiated inside constructors).
-* Lexical-clojure encapsulation of modules makes more sense. For example now you are 100% sure you will not leak anything into global scope.
+* Lexical-clojure encapsulation of modules makes more sense. For example now you are 100% sure you will not leak anything into outer/global scope.
 * You make your code DRYier (you write module name only once).
 * Auto discovery is just awesome!:D
 * ???

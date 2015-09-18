@@ -79,6 +79,18 @@ Autowire.prototype.markAsClass = function(className, singleton) {
   this.injector.moduleFinder.markAsClass(className, singleton);
 };
 
+Autowire.prototype.getModuleByName = function(moduleName) {
+  var fn = new Function(moduleName, "return "+moduleName);
+  return this(fn);
+};
+
+Autowire.prototype.test = function() {
+  //return eval("this(function(HttpApi) { return HttpApi; })");
+  var fn = new Function("HttpApi", "return HttpApi");
+  return this(fn);
+
+};
+
 /**
  * Add path to moduleFinder.
  *
