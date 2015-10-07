@@ -41,9 +41,6 @@ function getModuleFinder() {
 
   var parsed = PATH.parse(filename);
 
-  log("========= LEVEL %s =========", level);
-  log.info("Autowiring module \"%s\" with rootPath \"%s\"", parsed.base, parsed.dir);
-
   var moduleFinder = new ModuleFinder();
 
   moduleFinder.setCurrentPath(parsed.dir);
@@ -59,6 +56,9 @@ function Autowire(func) {
   var moduleFinder = getModuleFinder();
 
   var codeMutator = new CodeMutator();
+
+  log("========= LEVEL %s =========", level);
+  log.info("Autowiring module \"%s\" with rootPath \"%s\"", moduleFinder.currentPath, moduleFinder.parentModuleName);
 
   var injector = Injector(moduleFinder, codeMutator)
     .setAutowireModules(true);
@@ -87,5 +87,4 @@ Autowire.wire = function(name, object) {
   moduleFinder.addToCache(name, object);
 };
 
-// instantiate Autowire
 module.exports = Autowire;
