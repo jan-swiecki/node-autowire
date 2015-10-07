@@ -4,7 +4,8 @@
   "description": "Automagically autowire everything",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test/test.js"
+    "test": "mocha test/test.js",
+    "prerelease": "npm test"
   },
   "repository": {
     "type": "git",
