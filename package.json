@@ -1,6 +1,6 @@
 {
   "name": "autowire",
-  "version": "2.1.4-0",
+  "version": "2.2.0",
   "description": "Automagically autowire everything",
   "main": "index.js",
   "scripts": {
