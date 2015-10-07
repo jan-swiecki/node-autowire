@@ -33,6 +33,7 @@ Autowire.prototype.reset = function() {
   var dependencies = Autowire.getNewDependencies();
   this.injector = dependencies.injector;
   this.isExecuteOnImport = false;
+
   //this.moduleFinder.reset();
   //this.codeMutator.reset();
   //this.injector.reset();
@@ -52,8 +53,8 @@ Autowire.prototype.run = function(func) {
   var parsed = PATH.parse(filename);
   log.info("Autowiring module \"%s\" with rootPath \"%s\"", parsed.base, parsed.dir);
 
-  var inj = this.injector.withFunc(func).withRootPath(parsed.dir, parsed.base);
-  log("inj.rootPath = %s", inj.moduleFinder.rootPath);
+  var inj = this.injector.withFunc(func).withContextPath(parsed.dir, parsed.base);
+  log("inj.rootPath = %s", inj.moduleFinder.contextPath);
   return inj.exec();
   //return injector(func);
 };
@@ -133,12 +134,14 @@ Autowire.getInstance = function(codeMutator, moduleFinder, injector, instantiato
   return Functionize(Autowire, [codeMutator, moduleFinder, injector, instantiator], function(func) {
     // depth=2 because we are functionized
     var filename = ModuleHelper.getParentModule(PARENT_DEPTH).filename;
+
     var parsed = PATH.parse(filename);
+
     log.info("Autowiring module \"%s\" with rootPath \"%s\"", parsed.base, parsed.dir);
 
     return this.injector
         .withFunc(func)
-        .withRootPath(parsed.dir, parsed.base)
+        .withContextPath(parsed.dir, parsed.base)
         .exec();
   });
 };
