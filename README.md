@@ -115,7 +115,7 @@ Autowire(function(MyClass) {
 });
 ```
 
-Note: on each `Autowire` execution same class will be instantiated **each time** (cache won't work). If you want to have singleton behaviour pass set `autowire.singleton` to `true` on class object (e.g. `MyClass`).
+Note: on each `Autowire` execution same class will be instantiated **each time** (cache won't work). If you want to have singleton behaviour set `autowire.singleton` to `true` on class object (e.g. `MyClass.autowire = { instantiate: true, singleton: true };`).
 
 ## `getModuleByName`
 
