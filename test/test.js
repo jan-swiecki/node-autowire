@@ -81,5 +81,10 @@ describe('Autowire', function(){
         assert.equal(xyz, 'test_success');
       });
     });
+
+    it('should return module by name', function(){
+      var TestModule = Autowire.getModuleByName('TestModule');
+      assert.equal(TestModule.InnerTestModule, "inner test module");
+    });
   });
 });

@@ -1,5 +1,5 @@
 /**
- * Autowire module, singleton.
+ * Autowire module.
  *
  * @author Jan Święcki <jan.swiecki@gmail.com>
  */
@@ -9,11 +9,6 @@ var PATH = require("path");
 
 var log = require("./lib/DebugLogger.js").getLogger("autowire");
 log("Initializing Autowire module");
-
-//GLOBAL.trace = function(expr) {
-//  log("TRACE -> %s", expr);
-//  return expr;
-//};
 
 // get helpers
 var ModuleHelper = require("./lib/ModuleHelper.js");
@@ -36,8 +31,6 @@ function getParentModuleName() {
 var level = 0;
 
 function getModuleFinder() {
-  // depth=2 because we are functionized
-
   var parentModule = ModuleHelper.getParentModule(PARENT_DEPTH);
 
   if(! parentModule) {
@@ -79,9 +72,9 @@ function Autowire(func) {
   return ret;
 }
 
-Autowire.prototype.getModuleByName = function(moduleName) {
-  var fn = new Function(moduleName, "return "+moduleName);
-  return this(fn);
+Autowire.getModuleByName = function(moduleName) {
+  var fn = new Function(moduleName, "return "+moduleName+";");
+  return Autowire(fn);
 };
 
 Autowire.alias = function(alias, realname) {
@@ -92,23 +85,6 @@ Autowire.alias = function(alias, realname) {
 Autowire.wire = function(name, object) {
   var moduleFinder = getModuleFinder();
   moduleFinder.addToCache(name, object);
-};
-
-Autowire.newInstance = function() {
-  var dependencies = Autowire.getNewDependencies();
-
-  var autowire = Autowire.getInstance(dependencies.injector);
-
-  autowire.Injector = Injector;
-  autowire.ModuleFinder = ModuleFinder;
-  autowire.CodeMutator = CodeMutator;
-  autowire.Autowire = Autowire;
-  autowire.newInstance = Autowire.newInstance;
-  autowire.getInstance = Autowire.getInstance;
-  autowire.resetModule = Autowire.resetModule;
-  autowire.getNewDependencies = Autowire.getNewDependencies;
-
-  return autowire;
 };
 
 // instantiate Autowire

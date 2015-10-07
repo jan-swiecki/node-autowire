@@ -117,9 +117,16 @@ Autowire(function(MyClass) {
 
 Note: on each `Autowire` execution same class will be instantiated **each time** (cache won't work). If you want to have singleton behaviour pass set `autowire.singleton` to `true` on class object (e.g. `MyClass`).
 
+## `getModuleByName`
+
+Autowire can auto find a module by name. Just do `var MyLib = Autowire.getModuleByName('MyLib');`.
+
+This is a syntactic sugar for `var MyLib = Autowire(new Function("MyLib", "return MyLib;"));`.
+
+
 ## Module auto discovery algorithm
 
-Lets say we want to inject `name`.
+Let's say we want to inject `name`.
 
   Note: if `name` is an alias it will be first converted to aliased name, i.e. `name = alias[name]`.
 
