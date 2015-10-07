@@ -1,4 +1,4 @@
-Autowire 2.1 (beta)
+Autowire 2.2 (beta)
 ===================
 
 Angular-like automatic dependency injection for NodeJS.
@@ -20,9 +20,11 @@ This is beta version: API may change with minor versions, performance may suffer
 Autowire = require("autowire");
 
 // inject modules which are auto discovered
-Autowire(function(fs, express) {
+Autowire(function(fs, express, MyLib) {
 
   // ... do stuff with autowired modules, without `require`ing them ...
+
+  // MyLib.js location is auto discovered in project directory tree
 
   console.log(fs.existsSync("package.json"));
 
@@ -31,7 +33,7 @@ Autowire(function(fs, express) {
 
 # Advanced features
 
-## `alias`, `wire` and `importPaths`
+## `alias` and `wire`
 
 ```javascript
 Autowire = require("autowire");
@@ -39,20 +41,17 @@ Autowire = require("autowire");
 // alias
 // -----
 // Alias names. Here `lodash` will be requiered in place of `_`.
-Autowire.alias("_", "lodash");
+Autowire.alias("_", "lodash"); // this is an example, but _ is already automatically aliased
 
 // wire
 // ----
 // Directly wire names to values, so `myVar` will be injected with `{"awesome": "dude!"}`
 Autowire.wire("myVar", {"awesome": "dude!"});
 
-// importPaths
-// -----------
-// Add module discovery importPath (relative to current module)
-// E.g. lets say that `./module/DbModel.js` file exists.
-Autowire.addImportPath("./module");
-
 Autowire(function(fs, express, _, myVar, DbModel) {
+
+  // DbModel is auto discovered in project directory tree
+  // and if it is not found error is thrown
 
   console.log(myVar); // {"awesome": "dude!"}
   console.log(_); // lodash object
@@ -64,63 +63,79 @@ Autowire(function(fs, express, _, myVar, DbModel) {
 ## `module.exports`
 
 ```javascript
-// simple
+// ./lib/some/path/Test.js
 module.exports = Autowire(function(fs, express, _, myVar) {
 
-    // this will be returned from Autowire function
-    return {
-        test: function(x) {
-            console.log("x =", x);
-        }
-    };
+  // this will be attached to module.exports
+  return {
+    test: function(x) {
+      console.log("x =", x);
+    }
+  };
 
+});
+
+// ./index.js
+Autowire(function(Test) {
+  Test.test(1337); // outputs to console: x = 1337
 });
 ```
 
-## classes auto instantiation via `markAsClass` and `wireClass`
+## classes auto instantiation
 
-* `Autowire.markAsClass("MyClass")` to mark class with name `MyClass` to be auto insantiated
-* `Autowire.wireClass("MyInstance", MyClass)` to `wire` `MyClass` to name `MyInstance` with auto instantiation
+You can mark a class for auto instantiation with automatic dependency injection.
 
 **Example**
 
 ```javascript
-// ./lib/OtherLib.js
+// ./lib/leet.js
 module.exports = 1337;
 
 // ./lib/MyClass.js
-function MyClass(fs, OtherLib) {
+function MyClass(fs, leet) {
     this.fs = fs;
-    this.OtherLib = OtherLib;
+    this.leet = leet;
 }
+
+MyClass.autowire = {
+  instantiate: true,
+  
+  // if set to true then class is instatiated only once for multiple injections
+  singleton: false
+};
 
 module.exports = MyClass;
 
 // ./index.js
 Autowire = require("autowire");
-Autowire.markAsClass("MyClass");
 
 Autowire(function(MyClass) {
     console.log(MyClass.fs.existsSync("index.js")); // true
-    console.log(MyClass.OtherLib); // 1337
+    console.log(MyClass.leet); // 1337
 });
 ```
 
-Note: on each `Autowire` execution same class will be instantiated **each time** (cache won't work). If you want to have singleton behaviour pass `true` to `wireClass` or `markAsClass` as last parameter. E.g. `Autowire.markAsClass("MyClass", true)`.
+Note: on each `Autowire` execution same class will be instantiated **each time** (cache won't work). If you want to have singleton behaviour pass set `autowire.singleton` to `true` on class object (e.g. `MyClass`).
 
 ## Module auto discovery algorithm
 
 Lets say we want to inject `name`.
 
-    1. Try `inner_cache[name]` (hit Autowire inner cache)
-    2. Try `require(name)`
-    3. Construct search space of import paths:
-    
-       importPaths = ["./", "./lib"] ++ [added import paths] ++ ["../", "../../", "../../../", ... until we find first parent folder with package.json]
-       extensions  = [".js", ".json"]
-    
-    2. Try all combinations for all x and y: require( importPaths[x] + name + extensions[y] )
-    3. Return first found module
+  Note: if `name` is an alias it will be first converted to aliased name, i.e. `name = alias[name]`.
+
+  1. Find project root as the first folder up the directory structure with `package.json`. E.g. if we are at `/a/b/c/d` and there exists `/a/b/package.json` then `/a/b` is project root.
+  2. Map all file names to their absolute paths (ignore node_modules) and call it `name_cache`.
+  3. Try `inner_cache[name]` (hit Autowire inner cache)
+  4. Try to get path from `name_cache[name]` - if found then try to `require(name_cache[name])`
+  5. Try `require(name)`
+  6. If any try is successful:
+    * If found module is a function with `autowire.instantiate` set to `true`
+      * Instantiate as class instance
+      * If `autowire.singleton` is `true` then put instance inside `inner_cache`: `inner_cache[name] = instance`
+      * Return instance
+    * Else
+      * Save found module in `inner_cache`: `inner_cache[name] = found_module`
+      * Return found module
 
 ## Caching
 
@@ -142,9 +157,9 @@ Imho this is just a better approach.
 
 ## TODO
 
-* Auto discovery inside project folders (recursively)
-* Auto instantiation of classes (configurable)
-* Auto convert dash-case into camelCase, so e.g. we can with zero config inject `node-uuid` as `nodeUuid`. Maybe add auto discovery with partial matching, so `uuid` will match?
+* <s>Auto discovery inside project folders (recursively)</s> Done since version 2.2
+* <s>Auto instantiation of classes (configurable)</s> Done since version 2.2
+* <s>Auto convert dash-case into camelCase, so e.g. we can with zero config inject `node-uuid` as `nodeUuid`.</s> Done since version 2.2
 * Somehow allow having same file names in different folders. Proposition: create namespaces as folders (and manually configurable namespaces). (Non?)-problem: variable names don't have `/` character.
 * Write tests per module (e.g. tests for `ModuleFinder`)
 

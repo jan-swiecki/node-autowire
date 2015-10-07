@@ -1,15 +1,19 @@
 /**
  * Autowire module, singleton.
  *
- * @author Jan Œwiêcki <jan.swiecki@gmail.com>
+ * @author Jan ÅšwiÄ™cki <jan.swiecki@gmail.com>
  */
 
 // get modules
-var stackTrace = require('stack-trace');
 var PATH = require("path");
 
 var log = require("./lib/DebugLogger.js").getLogger("autowire");
 log("Initializing Autowire module");
+
+//GLOBAL.trace = function(expr) {
+//  log("TRACE -> %s", expr);
+//  return expr;
+//};
 
 // get helpers
 var ModuleHelper = require("./lib/ModuleHelper.js");
@@ -20,153 +24,74 @@ var Functionize = require("./lib/Functionize.js");
 var Injector = require("./lib/Injector.js");
 var ModuleFinder = require("./lib/ModuleFinder.js");
 var CodeMutator = require("./lib/CodeMutator.js");
-var Instantiator = require("./lib/Instantiator.js");
 
 // constants
-var PARENT_DEPTH = 2;
-
-function Autowire(injector) {
-  this.injector = injector;
-}
-
-Autowire.prototype.reset = function() {
-  var dependencies = Autowire.getNewDependencies();
-  this.injector = dependencies.injector;
-  this.isExecuteOnImport = false;
-
-  //this.moduleFinder.reset();
-  //this.codeMutator.reset();
-  //this.injector.reset();
-  //this.instantiator.reset();
-};
-
-/**
- * Execute autowire logic on func
- *
- * Wire dependencies and execute then return result
- *
- * @param func
- * @returns {Array|{index: number, input: string}}
- */
-Autowire.prototype.run = function(func) {
-  var filename = ModuleHelper.getParentModule(PARENT_DEPTH).filename;
-  var parsed = PATH.parse(filename);
-  log.info("Autowiring module \"%s\" with rootPath \"%s\"", parsed.base, parsed.dir);
-
-  var inj = this.injector.withFunc(func).withContextPath(parsed.dir, parsed.base);
-  log("inj.rootPath = %s", inj.moduleFinder.contextPath);
-  return inj.exec();
-  //return injector(func);
-};
+var PARENT_DEPTH = 1;
 
 function getParentModuleName() {
   var parentFilename = ModuleHelper.getParentModule(PARENT_DEPTH).filename;
   return PATH.parse(parentFilename).base;
 }
 
-Autowire.instantiate = function(clazz) {
-  throw "todo";
-  var obj = Object.create(clazz["prototype"]);
-  var constructor = injector.attachSafe(clazz).autoWireModules();
-  constructor.applyInject(obj);
-  return obj;
-};
+var level = 0;
 
-Autowire.prototype.wireClass = function(className, clazz, singleton) {
-  this.injector.moduleFinder.wireClass(className, clazz, singleton);
-};
+function getModuleFinder() {
+  // depth=2 because we are functionized
 
-Autowire.prototype.markAsClass = function(className, singleton) {
-  this.injector.moduleFinder.markAsClass(className, singleton);
-};
+  var parentModule = ModuleHelper.getParentModule(PARENT_DEPTH);
+
+  if(! parentModule) {
+    throw new Error("Cannot find parent module, depth = "+PARENT_DEPTH);
+  }
+
+  var filename = parentModule.filename;
+
+  var parsed = PATH.parse(filename);
+
+  log("========= LEVEL %s =========", level);
+  log.info("Autowiring module \"%s\" with rootPath \"%s\"", parsed.base, parsed.dir);
+
+  var moduleFinder = new ModuleFinder();
+
+  moduleFinder.setCurrentPath(parsed.dir);
+  moduleFinder.setParentModuleName(parsed.base);
+  moduleFinder.generateNameCache();
+
+  return moduleFinder;
+}
+
+function Autowire(func) {
+  level = level + 1;
+
+  var moduleFinder = getModuleFinder();
+
+  var codeMutator = new CodeMutator();
+
+  var injector = Injector(moduleFinder, codeMutator)
+    .setAutowireModules(true);
+
+  var ret = injector.exec(func);
+
+  log("========= /LEVEL %s =========", level);
+
+  level = level - 1;
+
+  return ret;
+}
 
 Autowire.prototype.getModuleByName = function(moduleName) {
   var fn = new Function(moduleName, "return "+moduleName);
   return this(fn);
 };
 
-Autowire.prototype.test = function() {
-  //return eval("this(function(HttpApi) { return HttpApi; })");
-  var fn = new Function("HttpApi", "return HttpApi");
-  return this(fn);
-
+Autowire.alias = function(alias, realname) {
+  var moduleFinder = getModuleFinder();
+  moduleFinder.addAlias(alias, realname);
 };
 
-/**
- * Add path to moduleFinder.
- *
- * Path is resolved to absolute path from callee context.
- *
- * @param path
- */
-Autowire.prototype.addImportPath = function(path) {
-  var absPath = PATH.join(PATH.parse(ModuleHelper.getParentModule(PARENT_DEPTH).filename).dir, path);
-  log.trace("addImportPath", absPath);
-  this.injector.moduleFinder.addImportPath(absPath);
-};
-
-Autowire.prototype.alias = function(alias, realname) {
-  this.injector.moduleFinder.addAlias(alias, realname);
-};
-
-Autowire.prototype.wire = function(name, object) {
-  this.injector.moduleFinder.wire(name, object);
-};
-
-//ClassHelper.attachClone(Autowire);
-
-Autowire.prototype.clone = function() {
-  return new Autowire(codeMutator.clone(), moduleFinder.clone(), injector.clone(), instantiator.clone());
-};
-
-/**
- * Instantiate on each import
- */
-Autowire.prototype.executeOnImport = function() {
-    this.injector.isExecuteOnImport = true;
-};
-
-//Autowire.prototype.getInstance = function() {
-//  return this.clone();
-//};
-
-Autowire.getInstance = function(codeMutator, moduleFinder, injector, instantiator) {
-  return Functionize(Autowire, [codeMutator, moduleFinder, injector, instantiator], function(func) {
-    // depth=2 because we are functionized
-    var filename = ModuleHelper.getParentModule(PARENT_DEPTH).filename;
-
-    var parsed = PATH.parse(filename);
-
-    log.info("Autowiring module \"%s\" with rootPath \"%s\"", parsed.base, parsed.dir);
-
-    return this.injector
-        .withFunc(func)
-        .withContextPath(parsed.dir, parsed.base)
-        .exec();
-  });
-};
-
-Autowire.resetModule = function() {
-  throw "todo";
-  //log.warn("Resetting global module instance of Autowire");
-  //require.cache[module.filename].exports = Autowire.newInstance();
-};
-
-Autowire.getNewDependencies = function() {
-  // instantiate classes
-  var codeMutator = new CodeMutator();
-  var instantiator = new Instantiator();
-  var moduleFinder = new ModuleFinder(instantiator);
-  var injector = Injector.create(moduleFinder, codeMutator).withAutowireModules();
-
-  // #yolo
-  // injector depends on moduleFinder depends on instantiator depends on injector
-  instantiator.setInjector(injector);
-
-  return {
-    injector: injector
-  };
-
+Autowire.wire = function(name, object) {
+  var moduleFinder = getModuleFinder();
+  moduleFinder.addToCache(name, object);
 };
 
 Autowire.newInstance = function() {
@@ -187,4 +112,4 @@ Autowire.newInstance = function() {
 };
 
 // instantiate Autowire
-module.exports = Autowire.newInstance();
+module.exports = Autowire;
