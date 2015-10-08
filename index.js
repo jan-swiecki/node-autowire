@@ -87,4 +87,9 @@ Autowire.wire = function(name, object) {
   moduleFinder.addToCache(name, object);
 };
 
+Autowire.include = function(pathToFile) {
+  var p = PATH.parse(pathToFile);
+  Autowire.alias(p.base.replace(/\.(?:js|json)$/, ''), pathToFile);
+};
+
 module.exports = Autowire;

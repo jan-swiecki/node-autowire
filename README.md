@@ -9,11 +9,11 @@ This module automagically autowires everything it can find. It finds installed m
 
 This is beta version: API may change with minor versions, performance may suffer.
 
-# Installation
+## Installation
 
     npm install autowire
 
-# Usage
+## Usage
 
 
 ```javascript
@@ -31,20 +31,16 @@ Autowire(function(fs, express, MyLib) {
 });
 ```
 
-# Advanced features
+## Advanced features
 
-## `alias` and `wire`
+### `alias` and `wire`
 
 ```javascript
 Autowire = require("autowire");
 
-// alias
-// -----
 // Alias names. Here `lodash` will be requiered in place of `_`.
 Autowire.alias("_", "lodash"); // this is an example, but _ is already automatically aliased
 
-// wire
-// ----
 // Directly wire names to values, so `myVar` will be injected with `{"awesome": "dude!"}`
 Autowire.wire("myVar", {"awesome": "dude!"});
 
@@ -60,7 +56,17 @@ Autowire(function(fs, express, _, myVar, DbModel) {
 });
 ```
 
-## `module.exports`
+### Autowire return value
+
+In simplest terms
+
+```javascript
+var x = Autowire(function(fs) { return fs; });
+
+console.log(x === require('fs')); // true
+```
+
+So when we create new module we can easily export it with `module.exports`:
 
 ```javascript
 // ./lib/some/path/Test.js
@@ -81,7 +87,7 @@ Autowire(function(Test) {
 });
 ```
 
-## classes auto instantiation
+### Class auto instantiation
 
 You can mark a class for auto instantiation with automatic dependency injection.
 
@@ -117,12 +123,40 @@ Autowire(function(MyClass) {
 
 Note: on each `Autowire` execution same class will be instantiated **each time** (cache won't work). If you want to have singleton behaviour set `autowire.singleton` to `true` on class object (e.g. `MyClass.autowire = { instantiate: true, singleton: true };`).
 
-## `getModuleByName`
+### `Autowire.getModuleByName(name)`
 
 Autowire can auto find a module by name. Just do `var MyLib = Autowire.getModuleByName('MyLib');`.
 
 This is a syntactic sugar for `var MyLib = Autowire(new Function("MyLib", "return MyLib;"));`.
 
+### `Autowire.include(path)` i.e. include submodules of a module
+
+```javascript
+// equivalent to require("urijs/src/URITemplate")
+Autowire.include("urijs/src/URITemplate");
+
+Autowire(function(URITemplate) {
+  var uriTemplate = new URITemplate();
+});
+```
+
+### Caching
+
+Beside native NodeJS module cache Autowire caches paths and performes autodiscovery only once.
+
+## Why?
+
+Imho this is just a better approach.
+
+* You don't waste time on manually resolving module relative paths.
+* You don't waste time on manually wiring dependencies.
+* Module dependencies are clearly and well defined (no more finding all `require` invocations).
+* You are forced to write code in a decoupled way (true dependency injection, without classes being instantiated inside constructors).
+* Lexical-clojure encapsulation of modules makes more sense.
+* You make your code DRYier (you write module name only once).
+* Auto discovery is awesome!:D
+* ???
+* Profit!
 
 ## Module auto discovery algorithm
 
@@ -144,24 +178,6 @@ Let's say we want to inject `name`.
       * Save found module in `inner_cache`: `inner_cache[name] = found_module`
       * Return found module
 
-## Caching
-
-Beside native NodeJS module cache Autowire caches paths and performes autodiscovery once.
-
-# Why?
-
-Imho this is just a better approach.
-
-* You don't waste time on manually resolving module relative paths.
-* You don't waste time on manually wiring dependencies.
-* Module dependencies are clearly and well defined (no more finding all `require` invocations).
-* You are forced to write code in a decoupled way (true dependency injection, without classes being instantiated inside constructors).
-* Lexical-clojure encapsulation of modules makes more sense. For example now you are 100% sure you will not leak anything into outer/global scope.
-* You make your code DRYier (you write module name only once).
-* Auto discovery is just awesome!:D
-* ???
-* Profit!
-
 ## TODO
 
 * <s>Auto discovery inside project folders (recursively)</s> Done since version 2.2
@@ -169,6 +185,7 @@ Imho this is just a better approach.
 * <s>Auto convert dash-case into camelCase, so e.g. we can with zero config inject `node-uuid` as `nodeUuid`.</s> Done since version 2.2
 * Somehow allow having same file names in different folders. Proposition: create namespaces as folders (and manually configurable namespaces). (Non?)-problem: variable names don't have `/` character.
 * Write tests per module (e.g. tests for `ModuleFinder`)
+* ECMAScript 6 support
 
 ## License
 

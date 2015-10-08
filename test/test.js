@@ -70,15 +70,29 @@ describe('Autowire', function(){
     });
 
     it('should wire test-module/lib/testMe', function(){
-      Autowire(function(testModule_lib_testMe){
-        assert.equal(testModule_lib_testMe, 'test_success');
+      Autowire(function(testModule$lib$testMe){
+        assert.equal(testModule$lib$testMe, 'test_success');
       });
     });
 
     it('should alias test-module/lib/testMe', function(){
-      Autowire.alias('xyz', 'testModule_lib_testMe')
+      Autowire.alias('xyz', 'testModule/lib/testMe');
       Autowire(function(xyz){
         assert.equal(xyz, 'test_success');
+      });
+    });
+
+    it('should include test-module/lib/testMe #1', function(){
+      Autowire.include('testModule/lib/testMe');
+      Autowire(function(testMe){
+        assert.equal(testMe, 'test_success');
+      });
+    });
+
+    it('should include test-module/lib/testMe.js', function(){
+      Autowire.include('testModule/lib/testMe.js');
+      Autowire(function(testMe){
+        assert.equal(testMe, 'test_success');
       });
     });
 
