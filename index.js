@@ -6,6 +6,7 @@
 
 // get modules
 var PATH = require("path");
+var fs = require("fs");
 
 var log = require("./lib/DebugLogger.js").getLogger("autowire");
 log("Initializing Autowire module");
@@ -87,9 +88,33 @@ Autowire.wire = function(name, object) {
   moduleFinder.addToCache(name, object);
 };
 
-Autowire.include = function(pathToFile) {
-  var p = PATH.parse(pathToFile);
-  Autowire.alias(p.base.replace(/\.(?:js|json)$/, ''), pathToFile);
+/**
+ * Include submodule e.g. Autowire.include('urijs/src/URITemplate')
+ * or include module at other path e.g. Autowire.include('c:\my_modules\urijs')
+ *
+ * In second case module must have package.json present in its folder.
+ *
+ * @param path
+ */
+Autowire.include = function(path) {
+  var p = PATH.resolve(path);
+  if(! fs.existsSync(p) || fs.lstatSync(p).isFile()) {
+    Autowire.alias(PATH.parse(p).base.replace(/\.(?:js|json)$/, ''), path);
+  } else if(fs.lstatSync(p).isDirectory()) {
+    var packageJsonPath = p+PATH.sep+"package.json";
+    if(fs.existsSync(packageJsonPath)) {
+      var packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+      var moduleFinder = getModuleFinder();
+
+      var absPath = PATH.resolve(p+PATH.sep+packageJson.main);
+
+      moduleFinder.updateNameCache(packageJson.name, absPath);
+    } else {
+      throw new Error("Cannot include library, cannot find package.json at \""+packageJsonPath+"\"");
+    }
+  } else {
+    log.error("Cannot include path \""+path+"\"");
+  }
 };
 
 module.exports = Autowire;

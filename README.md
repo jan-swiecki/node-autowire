@@ -129,15 +129,20 @@ Autowire can auto find a module by name. Just do `var MyLib = Autowire.getModule
 
 This is a syntactic sugar for `var MyLib = Autowire(new Function("MyLib", "return MyLib;"));`.
 
-### `Autowire.include(path)` i.e. include submodules of a module
+### `Autowire.include(path)` i.e. include submodules of a module or include module at different path
 
 ```javascript
 // equivalent to require("urijs/src/URITemplate")
 Autowire.include("urijs/src/URITemplate");
 
-Autowire(function(URITemplate) {
+Autowire.include("/some/absolute/path/of/node-uuid");
+Autowire.include("nodeUuid/some/sub/path/MyLib");
+
+Autowire(function(URITemplate, nodeUuid, MyLib) {
   var uriTemplate = new URITemplate();
+  var uuid = nodeUuid.v4();
 });
+
 ```
 
 ### Caching

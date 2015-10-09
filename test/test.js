@@ -100,5 +100,15 @@ describe('Autowire', function(){
       var TestModule = Autowire.getModuleByName('TestModule');
       assert.equal(TestModule.InnerTestModule, "inner test module");
     });
+
+    it('should include module', function(){
+      var currentPath = PATH.resolve(__dirname);
+      Autowire.include(currentPath+"/../test2");
+      Autowire.include("testModuleName/lib/SubModule");
+      Autowire(function(testModuleName, SubModule){
+        assert.equal(testModuleName, "testValue");
+        assert.equal(SubModule, "testSubModule");
+      })
+    });
   });
 });
