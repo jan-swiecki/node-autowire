@@ -1,6 +1,8 @@
 Autowire 2.2 (beta)
 ===================
 
+[![Build Status](https://api.travis-ci.org/jan-swiecki/node-autowire.svg?branch=master)](https://travis-ci.org/jan-swiecki/node-autowire)
+
 Angular-like automatic dependency injection for NodeJS.
 
 Buzzwords: Easy to use, Rapid prototyping, Easy decoupling, Focus On Things That Matter<sup>TM</sup>
