@@ -4,8 +4,7 @@
   "description": "Automagically autowire everything",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test/test.js",
-    "prepublish": "npm test"
+    "test": "node ./node_modules/mocha/bin/mocha test/test.js"
   },
   "repository": {
     "type": "git",
@@ -15,6 +14,9 @@
     "autowire",
     "dependency injection"
   ],
+  "devDependencies": {
+    "mocha": "2.3.*"
+  },
   "dependencies": {
     "bluebird": "^2.9.34",
     "debug": "^2.2.0",
