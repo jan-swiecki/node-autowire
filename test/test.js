@@ -1,6 +1,9 @@
 var assert = require("assert");
 var PATH = require("path");
 
+process.env["DEBUG"] = "*";
+process.env["DEBUG_LEVEL"] = "autowire:modulefinder=trace;autowire=trace";
+
 function randomInt(low, high) {
   return Math.floor(Math.random() * (high - low) + low);
 }

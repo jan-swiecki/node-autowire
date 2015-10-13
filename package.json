@@ -4,7 +4,7 @@
   "description": "Automagically autowire everything",
   "main": "index.js",
   "scripts": {
-    "test": "export DEBUG=*; export 'DEBUG_LEVEL=autowire:modulefinder=trace;autowire=trace'; node ./node_modules/mocha/bin/mocha test/test.js"
+    "test": "node ./node_modules/mocha/bin/mocha test/test.js"
   },
   "repository": {
     "type": "git",
