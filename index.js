@@ -11,6 +11,8 @@ var fs = require("fs");
 var log = require("./lib/DebugLogger.js").getLogger("autowire");
 log("Initializing Autowire module");
 
+log.trace("--------------------");
+
 // get helpers
 var ModuleHelper = require("./lib/ModuleHelper.js");
 var ClassHelper = require("./lib/helpers/ClassHelper.js");
@@ -40,7 +42,7 @@ function getModuleFinder() {
 
   var filename = parentModule.filename;
 
-  log.trace("[getModuleFinder] parentModule.filename = %s", parentModule.filename);
+  log.trace("parentModule.filename = %s", parentModule.filename);
 
   var parsed = PATH.parse(filename);
 
