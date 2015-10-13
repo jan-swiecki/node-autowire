@@ -40,6 +40,8 @@ function getModuleFinder() {
 
   var filename = parentModule.filename;
 
+  log.trace("parentModule.filename = %s", parentModule.filename);
+
   var parsed = PATH.parse(filename);
 
   var moduleFinder = new ModuleFinder();
