@@ -15,7 +15,7 @@
     "dependency injection"
   ],
   "devDependencies": {
-    "mocha": "2.3.*"
+    "mocha": "^5.2.0"
   },
   "dependencies": {
     "bluebird": "^2.9.34",
@@ -23,7 +23,7 @@
     "escodegen": "^1.6.1",
     "esprima": "2.1.*",
     "jquery-deferred": "0.3.*",
-    "lodash": "3.10.*",
+    "lodash": "^4.17.10",
     "node-uuid": "^1.4.3",
     "stack-trace": "0.0.*"
   },
