@@ -7,9 +7,11 @@
 // get modules
 var PATH = require("path");
 var fs = require("fs");
+var _ = require('lodash');
 
 var log = require("./lib/DebugLogger.js").getLogger("autowire");
-log("Initializing Autowire module");
+log.uniqueId = Math.random().toString(36).substring(2, 6);
+log(`Initializing Autowire module v${require('./package.json').version}`);
 
 // get helpers
 var ModuleHelper = require("./lib/ModuleHelper.js");
@@ -40,7 +42,7 @@ function getModuleFinder() {
 
   var filename = parentModule.filename;
 
-  log.trace("parentModule.filename = %s", parentModule.filename);
+  log.trace("[getModuleFinder] parentModule.filename = %s", parentModule.filename);
 
   var parsed = PATH.parse(filename);
 
@@ -53,8 +55,22 @@ function getModuleFinder() {
   return moduleFinder;
 }
 
+function loadLocalConfig(projectRoot, autowireInstance) {
+  let p = PATH.join(projectRoot, 'autowire.js');
+  if(fs.existsSync(p)) {
+    let f = require(p);
+    if(! _.isFunction(f)) {
+      throw new Error(`Config from '${p}' is not a function`);
+    }
+    log.info("Loading local config from \"%s\"", p);
+    f(autowireInstance);
+  }
+}
+
 function Autowire(func) {
   level = level + 1;
+
+  log.info("Initializing");
 
   var moduleFinder = getModuleFinder();
 
@@ -62,6 +78,8 @@ function Autowire(func) {
 
   log("========= LEVEL %s =========", level);
   log.info("Autowiring module \"%s\" with rootPath \"%s\"", moduleFinder.currentPath, moduleFinder.parentModuleName);
+
+  loadLocalConfig(moduleFinder.projectRoot, Autowire);
 
   var injector = Injector(moduleFinder, codeMutator)
     .setAutowireModules(true);

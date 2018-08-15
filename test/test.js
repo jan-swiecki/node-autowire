@@ -2,7 +2,7 @@ var assert = require("assert");
 var PATH = require("path");
 
 process.env["DEBUG"] = "*";
-process.env["DEBUG_LEVEL"] = "autowire:modulefinder=trace;autowire=trace";
+process.env["DEBUG_LEVEL"] = "modulefinder=trace;autowire=trace";
 
 function randomInt(low, high) {
   return Math.floor(Math.random() * (high - low) + low);
@@ -78,7 +78,7 @@ describe('Autowire', function(){
       });
     });
 
-    it('should alias test-module/lib/testMe', function(){
+    it('should alias test-modtestModuleNamele/lib/testMe', function(){
       Autowire.alias('xyz', 'testModule/lib/testMe');
       Autowire(function(xyz){
         assert.equal(xyz, 'test_success');
@@ -111,6 +111,16 @@ describe('Autowire', function(){
       Autowire(function(testModuleName, SubModule){
         assert.equal(testModuleName, "testValue");
         assert.equal(SubModule, "testSubModule");
+      })
+    });
+
+    it('should include sub module from wired module', function(){
+      var currentPath = PATH.resolve(__dirname);
+      Autowire.wire('testModuleName3', require(currentPath+"/test3"));
+      Autowire.include("testModuleName3/lib/SubModule");
+      Autowire(function(testModuleName3, SubModule){
+        assert.equal(testModuleName, "testValue3");
+        assert.equal(SubModule, "testSubModule3");
       })
     });
   });
