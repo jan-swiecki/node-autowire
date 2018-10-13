@@ -84,6 +84,11 @@ function Autowire(func) {
   var injector = Injector(moduleFinder, codeMutator)
     .setAutowireModules(true);
 
+  if(Autowire.addAutowireId) {
+    log.info('Setting addAutowireId = true');
+    injector.setAddAutowireId(true);
+  }
+
   var ret = injector.exec(func);
 
   log("========= /LEVEL %s =========", level);
