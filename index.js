@@ -89,6 +89,8 @@ function Autowire(func) {
     injector.setAddAutowireId(true);
   }
 
+  Autowire.injector = injector;
+
   var ret = injector.exec(func);
 
   log("========= /LEVEL %s =========", level);
@@ -112,6 +114,10 @@ Autowire.wire = function(name, object) {
   var moduleFinder = getModuleFinder();
   moduleFinder.addToCache(name, object);
 };
+
+Autowire.getInjector = function() {
+  return Autowire.injector;
+}
 
 /**
  * Include submodule e.g. Autowire.include('urijs/src/URITemplate')
