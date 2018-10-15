@@ -69,29 +69,32 @@ function loadLocalConfig(projectRoot, autowireInstance) {
 
 function Autowire(func) {
   level = level + 1;
+  
+  if(! Autowire.initialized) {
+    log.info("Initializing");
 
-  log.info("Initializing");
-
-  var moduleFinder = getModuleFinder();
-
-  var codeMutator = new CodeMutator();
-
-  log("========= LEVEL %s =========", level);
-  log.info("Autowiring module \"%s\" with rootPath \"%s\"", moduleFinder.currentPath, moduleFinder.parentModuleName);
-
-  loadLocalConfig(moduleFinder.projectRoot, Autowire);
-
-  var injector = Injector(moduleFinder, codeMutator)
-    .setAutowireModules(true);
-
-  if(Autowire.addAutowireId) {
-    log.info('Setting addAutowireId = true');
-    injector.setAddAutowireId(true);
+    let moduleFinder = getModuleFinder();
+  
+    let codeMutator = new CodeMutator();
+  
+    log("========= LEVEL %s =========", level);
+    log.info("Autowiring module \"%s\" with rootPath \"%s\"", moduleFinder.currentPath, moduleFinder.parentModuleName);
+  
+    loadLocalConfig(moduleFinder.projectRoot, Autowire);
+  
+    let injector = Injector(moduleFinder, codeMutator)
+      .setAutowireModules(true);
+  
+    if(Autowire.addAutowireId) {
+      log.info('Setting addAutowireId = true');
+      injector.setAddAutowireId(true);
+    }
+  
+    Autowire.injector = injector;
+    Autowire.initialized = true;
   }
 
-  Autowire.injector = injector;
-
-  var ret = injector.exec(func);
+  var ret = Autowire.injector.exec(func);
 
   log("========= /LEVEL %s =========", level);
 
