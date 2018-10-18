@@ -50,7 +50,7 @@ function getModuleFinder() {
 
   moduleFinder.setCurrentPath(parsed.dir);
   moduleFinder.setParentModuleName(parsed.base);
-  moduleFinder.generateNameCache();
+  moduleFinder.findProjectRoot();
 
   return moduleFinder;
 }
@@ -82,6 +82,12 @@ function Autowire(func) {
   
     loadLocalConfig(moduleFinder.projectRoot, Autowire);
   
+    if(Autowire.moduleFinderIgnoreFolders) {
+      log.info('Ignoring folders: %s', Autowire.moduleFinderIgnoreFolders);
+      moduleFinder.addIgnoreFolders(Autowire.moduleFinderIgnoreFolders);
+    }
+    moduleFinder.generateNameCache();
+
     let injector = Injector(moduleFinder, codeMutator)
       .setAutowireModules(true);
   
