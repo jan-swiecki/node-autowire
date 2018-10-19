@@ -113,6 +113,19 @@ describe('Autowire', function(){
         assert.equal(SubModule, "testSubModule");
       })
     });
+    
+    it('injector should deepInject parameter into subsequent class instances', function(){
+      Autowire.include("testModuleName/lib/TestScopeClass");
+      let injector = Autowire.getInjector();
+
+      injector.exec(function(Scope, TestScopeClass) {
+        // console.log("TestScopeClass", TestScopeClass)
+        assert.equal(TestScopeClass.Scope, 'test');
+        assert.equal(TestScopeClass.Scope, Scope);
+      }, {
+        "Scope": 'test'
+      }, true);
+    });
 
     it('should include sub module from wired module', function(){
       var currentPath = PATH.resolve(__dirname);
