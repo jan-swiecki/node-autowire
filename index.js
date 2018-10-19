@@ -67,18 +67,18 @@ function loadLocalConfig(projectRoot, autowireInstance) {
   }
 }
 
-function Autowire(func) {
-  level = level + 1;
-  
+function init() {
   if(! Autowire.initialized) {
     log.info("Initializing");
 
     let moduleFinder = getModuleFinder();
   
+    Autowire.moduleFinder = moduleFinder;
+  
     let codeMutator = new CodeMutator();
   
     log("========= LEVEL %s =========", level);
-    log.info("Autowiring module \"%s\" with rootPath \"%s\"", moduleFinder.currentPath, moduleFinder.parentModuleName);
+    log("Autowiring module \"%s\" with rootPath \"%s\"", moduleFinder.currentPath, moduleFinder.parentModuleName);
   
     loadLocalConfig(moduleFinder.projectRoot, Autowire);
   
@@ -99,6 +99,12 @@ function Autowire(func) {
     Autowire.injector = injector;
     Autowire.initialized = true;
   }
+}
+
+function Autowire(func) {
+  level = level + 1;
+  
+  init();
 
   var ret = Autowire.injector.exec(func);
 
@@ -115,13 +121,15 @@ Autowire.getModuleByName = function(moduleName) {
 };
 
 Autowire.alias = function(alias, realname) {
-  var moduleFinder = getModuleFinder();
-  moduleFinder.addAlias(alias, realname);
+  init();
+  log("aliasing %s=%s", alias, realname);
+  Autowire.moduleFinder.addAlias(alias, realname);
 };
 
 Autowire.wire = function(name, object) {
-  var moduleFinder = getModuleFinder();
-  moduleFinder.addToCache(name, object);
+  init();
+  log("wiring object as %s", name);
+  Autowire.moduleFinder.addToCache(name, object);
 };
 
 Autowire.getInjector = function() {
@@ -137,18 +145,21 @@ Autowire.getInjector = function() {
  * @param path
  */
 Autowire.include = function(path) {
+  init();
+  log("include path %s", path);
   var p = PATH.resolve(path);
+
+  // if file doesn't exists or if it exists then if it is file
   if(! fs.existsSync(p) || fs.lstatSync(p).isFile()) {
     Autowire.alias(PATH.parse(p).base.replace(/\.(?:js|json)$/, ''), path);
   } else if(fs.lstatSync(p).isDirectory()) {
     var packageJsonPath = p+PATH.sep+"package.json";
     if(fs.existsSync(packageJsonPath)) {
       var packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
-      var moduleFinder = getModuleFinder();
 
       var absPath = PATH.resolve(p+PATH.sep+packageJson.main);
 
-      moduleFinder.updateNameCache(packageJson.name, absPath);
+      Autowire.moduleFinder.updateNameCache(packageJson.name, absPath);
     } else {
       throw new Error("Cannot include library, cannot find package.json at \""+packageJsonPath+"\"");
     }

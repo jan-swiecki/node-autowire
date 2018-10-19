@@ -78,7 +78,7 @@ describe('Autowire', function(){
       });
     });
 
-    it('should alias test-modtestModuleNamele/lib/testMe', function(){
+    it('should alias test-module/lib/testMe', function(){
       Autowire.alias('xyz', 'testModule/lib/testMe');
       Autowire(function(xyz){
         assert.equal(xyz, 'test_success');
@@ -119,9 +119,9 @@ describe('Autowire', function(){
       Autowire.wire('testModuleName3', require(currentPath+"/test3"));
       Autowire.include("testModuleName3/lib/SubModule");
       Autowire(function(testModuleName3, SubModule){
-        assert.equal(testModuleName, "testValue3");
+        assert.equal(testModuleName3, "testValue3");
         assert.equal(SubModule, "testSubModule3");
-      })
+      });
     });
   });
 });
