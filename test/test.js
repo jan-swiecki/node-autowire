@@ -127,6 +127,32 @@ describe('Autowire', function(){
       }, true);
     });
 
+    it('injector should instantiate given class', function(){
+      class Test {
+        constructor(MyClassModuleSingleton1, MyClassModuleSingleton2, InnerTestModule) {
+          this.MyClassModuleSingleton1 = MyClassModuleSingleton1;
+          this.MyClassModuleSingleton2 = MyClassModuleSingleton2;
+          this.InnerTestModule = InnerTestModule;
+        }
+      }
+
+      Test.autowire = {
+        instantiate: true
+      };
+
+      let injector = Autowire.getInjector();
+      let obj = injector.getInstance(Test);
+
+      let MyClassSingleton = require("./MyClassSingleton.js");
+      assert(obj.MyClassModuleSingleton1 instanceof MyClassSingleton, "MyClassModuleSingleton1 should be instance of MyClass");
+      assert(obj.MyClassModuleSingleton2 instanceof MyClassSingleton, "MyClassModuleSingleton2 should be instance of MyClass");
+      assert(!!obj.MyClassModuleSingleton1.uuid, "uuid1 should be defined");
+      assert(!!obj.MyClassModuleSingleton2.uuid, "uuid2 should be defined");
+      assert.equal(obj.MyClassModuleSingleton1.uuid, obj.MyClassModuleSingleton2.uuid);
+      assert.equal(obj.MyClassModuleSingleton1.uuid, obj.MyClassModuleSingleton2.uuid);
+      assert.equal(obj.InnerTestModule, "inner test module");
+    });
+
     it('should include sub module from wired module', function(){
       var currentPath = PATH.resolve(__dirname);
       Autowire.wire('testModuleName3', require(currentPath+"/test3"));

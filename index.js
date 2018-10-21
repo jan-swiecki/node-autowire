@@ -116,6 +116,7 @@ function Autowire(func) {
 }
 
 Autowire.getModuleByName = function(moduleName) {
+  init();
   var fn = new Function(moduleName, "return "+moduleName+";");
   return Autowire(fn);
 };
@@ -133,6 +134,7 @@ Autowire.wire = function(name, object) {
 };
 
 Autowire.getInjector = function() {
+  init();
   return Autowire.injector;
 }
 
