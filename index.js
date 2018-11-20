@@ -26,61 +26,27 @@ var CodeMutator = require("./lib/CodeMutator.js");
 // constants
 var PARENT_DEPTH = 1;
 
-function getParentModuleName() {
-  var parentFilename = ModuleHelper.getParentModule(PARENT_DEPTH).filename;
-  return PATH.parse(parentFilename).base;
-}
+// function getParentModuleName() {
+//   var parentFilename = ModuleHelper.getParentModule(PARENT_DEPTH).filename;
+//   return PATH.parse(parentFilename).base;
+// }
 
 var level = 0;
-
-function getModuleFinder() {
-  var parentModule = ModuleHelper.getParentModule(PARENT_DEPTH);
-
-  if(! parentModule) {
-    throw new Error("Cannot find parent module, depth = "+PARENT_DEPTH);
-  }
-
-  var filename = parentModule.filename;
-
-  log.trace("[getModuleFinder] parentModule.filename = %s", parentModule.filename);
-
-  var parsed = PATH.parse(filename);
-
-  var moduleFinder = new ModuleFinder();
-
-  moduleFinder.setCurrentPath(parsed.dir);
-  moduleFinder.setParentModuleName(parsed.base);
-  moduleFinder.findProjectRoot();
-
-  return moduleFinder;
-}
-
-function loadLocalConfig(projectRoot, autowireInstance) {
-  let p = PATH.join(projectRoot, 'autowire.js');
-  if(fs.existsSync(p)) {
-    let f = require(p);
-    if(! _.isFunction(f)) {
-      throw new Error(`Config from '${p}' is not a function`);
-    }
-    log.info("Loading local config from \"%s\"", p);
-    f(autowireInstance);
-  }
-}
 
 function init() {
   if(! Autowire.initialized) {
     log.info("Initializing");
 
-    let moduleFinder = getModuleFinder();
+    let moduleFinder = Autowire._getModuleFinder();
   
     Autowire.moduleFinder = moduleFinder;
   
     let codeMutator = new CodeMutator();
-  
+    
     log("========= LEVEL %s =========", level);
     log("Autowiring module \"%s\" with rootPath \"%s\"", moduleFinder.currentPath, moduleFinder.parentModuleName);
   
-    loadLocalConfig(moduleFinder.projectRoot, Autowire);
+    Autowire._loadLocalConfig(moduleFinder.projectRoot, Autowire);
   
     if(Autowire.moduleFinderIgnoreFolders) {
       log.info('Ignoring folders: %s', Autowire.moduleFinderIgnoreFolders);
@@ -113,6 +79,40 @@ function Autowire(func) {
   level = level - 1;
 
   return ret;
+}
+
+Autowire._getModuleFinder = function() {
+  var parentModule = ModuleHelper.getParentModule(PARENT_DEPTH);
+
+  if(! parentModule) {
+    throw new Error("Cannot find parent module, depth = "+PARENT_DEPTH);
+  }
+
+  var filename = parentModule.filename;
+
+  log.trace("[getModuleFinder] parentModule.filename = %s", parentModule.filename);
+
+  var parsed = PATH.parse(filename);
+
+  var moduleFinder = new ModuleFinder();
+
+  moduleFinder.setCurrentPath(parsed.dir);
+  moduleFinder.setParentModuleName(parsed.base);
+  moduleFinder.findProjectRoot();
+
+  return moduleFinder;
+}
+
+Autowire._loadLocalConfig = function(projectRoot, autowireInstance) {
+  let p = PATH.join(projectRoot, 'autowire.js');
+  if(fs.existsSync(p)) {
+    let f = require(p);
+    if(! _.isFunction(f)) {
+      throw new Error(`Config from '${p}' is not a function`);
+    }
+    log.info("Loading local config from \"%s\"", p);
+    f(autowireInstance);
+  }
 }
 
 Autowire.getModuleByName = function(moduleName) {
