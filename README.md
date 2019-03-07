@@ -147,6 +147,14 @@ Autowire(function(URITemplate, nodeUuid, MyLib) {
 
 ```
 
+### Proxies
+
+TODO
+
+### Mixins
+
+TODO
+
 ### Caching
 
 Beside native NodeJS module cache Autowire caches paths and performes autodiscovery only once.
@@ -193,6 +201,7 @@ Let's say we want to inject `name`.
 * Somehow allow having same file names in different folders. Proposition: create namespaces as folders (and manually configurable namespaces). (Non?)-problem: variable names don't have `/` character.
 * Write tests per module (e.g. tests for `ModuleFinder`)
 * ECMAScript 6 support
+* Write tests for proxies and mixins
 
 ## License
 
