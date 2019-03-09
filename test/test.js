@@ -163,4 +163,56 @@ describe('Autowire', function(){
       });
     });
   });
+
+  describe('wiring default values', function() {
+    let injector = Autowire.getInjector();
+    it('wire default values in function #1', function(){
+      injector.exec(function(x, y = 1){
+        assert.strictEqual(x, 1);
+        assert.strictEqual(y, 1);
+      }, {
+        x: 1
+      });
+    });
+
+    it('wire default values in function #2', function(){
+      injector.exec(function(x, y = 1){
+        assert.strictEqual(x, 2);
+        assert.strictEqual(y, 2);
+      }, {
+        x: 2,
+        y: 2
+      });
+    });
+
+    class X {
+      constructor(x, y = 1) {
+        this.x = x;
+        this.y = y;
+      }
+    }
+
+    X.autowire = {
+      instantiate: true
+    };
+
+    it('wire default values in class instance #1', function(){
+      const instance = injector.instantiateClass(X, {
+        x: 1
+      });
+
+      assert.strictEqual(instance.x, 1);
+      assert.strictEqual(instance.y, 1);
+    });
+
+    it('wire default values in class instance #2', function(){
+      const instance = injector.instantiateClass(X, {
+        x: 2,
+        y: 2
+      });
+
+      assert.strictEqual(instance.x, 2);
+      assert.strictEqual(instance.y, 2);
+    });
+  });
 });
