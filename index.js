@@ -82,15 +82,22 @@ function Autowire(func) {
 }
 
 Autowire._getModuleFinder = function() {
-  var parentModule = ModuleHelper.getParentModule(PARENT_DEPTH);
+  var filename;
 
-  if(! parentModule) {
-    throw new Error("Cannot find parent module, depth = "+PARENT_DEPTH);
+  if(Autowire._rootPath) {
+    log('[getModuleFinder] _rootPath override with: '+Autowire._rootPath);
+    filename = Autowire._rootPath;
+  } else {
+    var parentModule = ModuleHelper.getParentModule(PARENT_DEPTH);
+  
+    if(! parentModule) {
+      throw new Error("Cannot find parent module, depth = "+PARENT_DEPTH);
+    }
+  
+    filename = parentModule.filename;
   }
 
-  var filename = parentModule.filename;
-
-  log.trace("[getModuleFinder] parentModule.filename = %s", parentModule.filename);
+  log.trace("[getModuleFinder] filename = %s", filename);
 
   var parsed = PATH.parse(filename);
 
