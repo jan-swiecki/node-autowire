@@ -203,6 +203,7 @@ Let's say we want to inject `name`.
 * ECMAScript 6 support
 * Write tests for proxies and mixins
 * Caching mechanics work in such a way that once certain name was not found then autowire will mark it as not found and even if you wire it manually later with `wire` it will not be found. Fix this behaviour.
+* Add cross browser Map polyfill in inside Injector cache
 
 
 ## License
